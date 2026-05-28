@@ -1,0 +1,792 @@
+PRODUCT REQUIREMENTS DOCUMENT (PRD)
+
+Project Name
+
+CVBora AI — Tanzania’s Smart Employability & CV Intelligence Platform
+
+---
+
+Document Version
+
+Version 1.0
+
+
+Product Type
+
+AI-Powered Web Platform / Progressive Web App (PWA)
+
+Primary Market
+
+Tanzania
+
+Target Users
+
+- University students
+- Fresh graduates
+- Professionals
+- Internship seekers
+- HR departments
+- Recruiters
+- Employment agencies
+- Career centers
+- Government employment initiatives
+
+---
+
+1. EXECUTIVE SUMMARY
+
+CVBora AI is an AI-powered employability platform designed specifically for the Tanzanian job market. The platform enables students, graduates, and professionals to create professional, ATS-friendly, and HR-approved CVs using localized Tanzanian hiring standards.
+
+The system guides users through educational history, skills, experience, certifications, and career goals, then intelligently generates optimized CVs based on:
+
+- Industry standards
+- Tanzanian recruitment expectations
+- HR-approved formatting
+- ATS compliance
+- Career-specific optimization
+
+The platform aims to bridge the gap between Tanzanian graduates and modern employment requirements while improving hiring quality for recruiters and employers.
+
+---
+
+2. PROBLEM STATEMENT
+
+Current Market Problems in Tanzania
+
+Graduate Problems
+
+- Poor CV formatting
+- Generic copied CVs
+- Lack of ATS optimization
+- Weak presentation skills
+- No understanding of HR expectations
+- Limited career guidance
+- Low employability readiness
+
+Employer Problems
+
+- Thousands of poor-quality CVs
+- Difficulty filtering candidates
+- Time wasted reviewing irrelevant applications
+- Inconsistent CV structures
+- Poor candidate presentation
+
+Educational Institution Problems
+
+- Universities focus on academics, not employability
+- Lack of modern recruitment training
+- Limited exposure to corporate standards
+
+---
+
+3. PRODUCT VISION
+
+To become Tanzania’s leading employability infrastructure platform by standardizing professional CV creation, improving graduate employability, and connecting HR intelligence with local talent.
+
+---
+
+4. PRODUCT MISSION
+
+Empower Tanzanian graduates and professionals with AI-driven employability tools tailored specifically to Tanzania’s recruitment ecosystem.
+
+---
+
+5. CORE PRODUCT OBJECTIVES
+
+Primary Objectives
+
+- Improve CV quality in Tanzania
+- Increase graduate employability
+- Standardize professional CV formatting
+- Reduce recruiter screening time
+- Create HR-aligned job application systems
+
+Secondary Objectives
+
+- Build a Tanzanian employability database
+- Support internship opportunities
+- Enable career guidance
+- Integrate job-matching intelligence
+- Create recruitment analytics
+
+---
+
+6. TARGET AUDIENCE
+
+Primary Users
+
+A. University Students
+
+Age:
+18–33
+
+Needs:
+
+- Internship CVs
+- First-job applications
+- Career guidance
+- ATS-friendly formatting
+
+Pain Points:
+
+- No experience
+- No professional guidance
+- Confusing CV standards
+
+---
+
+B. Fresh Graduates
+
+Age:
+21–33
+
+Needs:
+
+- Professional CVs
+- Industry-specific applications
+- Job readiness scoring
+
+Pain Points:
+
+- Repeated rejection
+- Weak presentation
+- Generic CV templates
+
+---
+
+C. Working Professionals
+
+Needs:
+
+- Career transition CVs
+- Promotion applications
+- International-standard formatting
+
+---
+
+Secondary Users
+
+HR Departments
+
+Needs:
+
+- Better candidate quality
+- Faster filtering
+- ATS-compatible CVs
+- Candidate ranking
+
+---
+
+Universities & Institutions
+
+Needs:
+
+- Student employability tools
+- Career center integrations
+- Graduate readiness systems
+
+---
+
+7. CORE PRODUCT FEATURES
+
+PHASE 1 — MVP
+
+7.1 USER AUTHENTICATION
+
+Features
+
+- Email signup/login
+- Google authentication
+- Phone number login
+- OTP verification
+
+User Roles
+
+- Student/User
+- Recruiter
+- Admin
+- HR Expert
+
+---
+
+7.2 SMART CV BUILDER
+
+Multi-Step Form Wizard
+
+Step 1 — Personal Information
+
+Fields:
+
+- Full Name
+- Phone Number
+- Email
+- Location
+- LinkedIn
+- Portfolio
+- Date of Birth (optional)
+- Nationality
+
+---
+
+Step 2 — Career Objective
+
+AI assists users in generating:
+
+- Professional summaries
+- Career objectives
+- Personal statements
+
+---
+
+Step 3 — Education History
+
+Fields:
+
+- Institution
+- Degree
+- GPA
+- Graduation Year
+- Awards
+- Relevant coursework
+
+---
+
+Step 4 — Work Experience
+
+Fields:
+
+- Company
+- Position
+- Responsibilities
+- Achievements
+- Start/End Dates
+
+AI Enhancement:
+
+- Rewrites bullet points professionally
+- Converts weak descriptions into HR-standard language
+- Quantifies achievements where possible
+
+---
+
+Step 5 — Skills
+
+Examples:
+
+- Communication
+- Microsoft Office
+- Accounting
+- Customer Service
+- IT Support
+
+AI Suggestion Engine:
+Suggests skills based on:
+
+- Degree
+- Career field
+- Experience
+
+---
+
+Step 6 — Certifications
+
+Examples:
+
+- Digital Marketing
+- Cisco
+- CPA
+- Google Certificates
+
+---
+
+Step 7 — Referees
+
+Fields:
+
+- Name
+- Position
+- Contact
+- Organization
+
+---
+
+7.3 AI CV GENERATION ENGINE
+
+AI Features
+
+- ATS optimization
+- Grammar correction
+- Formatting intelligence
+- Industry-specific wording
+- Tanzanian HR standardization
+
+CV Types
+
+- Graduate CV
+- Corporate CV
+- NGO CV
+- Government CV
+- Internship CV
+- Academic CV
+- Hospitality CV
+- Banking CV
+- Aviation CV
+
+---
+
+7.4 CV TEMPLATES
+
+Template Categories
+
+- Modern
+- Executive
+- Corporate
+- ATS Minimal
+- Government Formal
+- Creative Professional
+
+Features
+
+- PDF export
+- DOCX export
+- Print-ready formatting
+
+---
+
+7.5 HR SCORE SYSTEM
+
+Scoring Metrics
+
+- ATS compatibility
+- Grammar quality
+- Relevance
+- Formatting quality
+- Industry alignment
+- Skills match
+
+Example Output
+
+“Your CV has 82% readiness for banking-related positions.”
+
+---
+
+7.6 JOB TARGETING ENGINE
+
+User selects:
+
+- Industry
+- Role
+- Experience level
+
+AI adapts:
+
+- Keywords
+- Summary
+- Skills emphasis
+- Layout priority
+
+---
+
+7.7 MULTI-LANGUAGE SUPPORT
+
+Languages:
+
+- English
+- Kiswahili
+
+Future:
+
+- Bilingual CV generation
+
+---
+
+8. PHASE 2 FEATURES
+
+8.1 JOB BOARD INTEGRATION
+
+- Employers post jobs
+- Users apply directly
+- AI matches candidates
+
+---
+
+8.2 AI COVER LETTER GENERATOR
+
+- Role-specific cover letters
+- HR-tailored language
+
+---
+
+8.3 INTERVIEW PREPARATION
+
+- AI mock interview questions
+- Industry-specific interview coaching
+
+---
+
+8.4 EMPLOYABILITY DASHBOARD
+
+Tracks:
+
+- CV strength
+- Application history
+- Skills gaps
+- Career readiness
+
+---
+
+9. PHASE 3 FEATURES
+
+9.1 HR DASHBOARD
+
+Features
+
+- Candidate ranking
+- AI filtering
+- Shortlisting
+- Recruitment analytics
+
+---
+
+9.2 UNIVERSITY PORTALS
+
+Universities can:
+
+- onboard students
+- monitor employability
+- export reports
+
+---
+
+9.3 RECRUITMENT AI
+
+AI ranks candidates based on:
+
+- job requirements
+- skills
+- experience
+- CV quality
+
+---
+
+10. USER FLOW
+
+Student Flow
+
+Signup → Build Profile → AI Enhancement → Generate CV → HR Score → Export PDF → Apply for Jobs
+
+---
+
+Recruiter Flow
+
+Create Account → Post Job → View Candidates → AI Ranking → Shortlist → Contact Candidates
+
+---
+
+11. UI/UX REQUIREMENTS
+
+Design Direction
+
+- Premium
+- Minimal
+- Mobile-first
+- Corporate modern
+- Clean typography
+- ATS-focused readability
+
+UI Style
+
+- Soft gradients
+- Professional cards
+- Step-by-step wizard
+- AI assistant guidance
+- Dashboard analytics
+
+---
+
+12. TECH STACK
+
+Frontend
+
+- Next.js
+- React
+- TailwindCSS
+- Framer Motion
+- PWA support
+
+Backend
+
+- Supabase
+- PostgreSQL
+- Node.js APIs
+
+AI Layer
+
+Options:
+
+- OpenAI API
+- Claude API
+- Gemini API
+
+---
+
+13. DATABASE STRUCTURE
+
+Core Tables
+
+Users
+
+- id
+- fullname
+- email
+- role
+- created_at
+
+Education
+
+- user_id
+- institution
+- degree
+- year
+
+Experience
+
+- user_id
+- company
+- role
+- description
+
+Skills
+
+- user_id
+- skill_name
+
+Generated_CVs
+
+- user_id
+- template
+- ATS_score
+- export_url
+
+Jobs
+
+- employer_id
+- title
+- description
+- requirements
+
+---
+
+14. AI LOGIC REQUIREMENTS
+
+AI Must:
+
+- Never fabricate experience
+- Never create fake qualifications
+- Improve grammar only
+- Optimize wording
+- Maintain truthfulness
+
+AI Should:
+
+- Detect weak descriptions
+- Suggest stronger wording
+- Recommend missing sections
+
+---
+
+15. ADMIN PANEL
+
+Features
+
+- User management
+- HR expert approvals
+- CV template management
+- Analytics dashboard
+- Subscription management
+- Job moderation
+
+---
+
+16. ANALYTICS
+
+Track:
+
+- CV generation count
+- Most requested industries
+- Job application trends
+- Employability scores
+- Recruiter activity
+
+---
+
+17. MONETIZATION MODEL
+
+Freemium
+
+Free Plan
+
+- Basic CV generation
+- 1 template
+- Limited export
+
+Premium Plan
+
+- Unlimited CV exports
+- ATS optimization
+- HR scoring
+- Cover letters
+- Premium templates
+- AI career suggestions
+
+Pricing
+
+Estimated:
+
+- TZS 3,000–15,000 monthly
+
+---
+
+18. SECURITY REQUIREMENTS
+
+- Encrypted authentication
+- Secure document storage
+- GDPR-aware architecture
+- Data privacy compliance
+- CV ownership protection
+
+---
+
+19. PERFORMANCE REQUIREMENTS
+
+Load Speed
+
+- Under 3 seconds
+
+Mobile Optimization
+
+- Full mobile responsiveness
+- Offline PWA support
+
+Scalability
+
+- Minimum 100,000 users
+
+---
+
+20. SUCCESS METRICS
+
+KPIs
+
+- CVs generated monthly
+- User retention
+- Export count
+- Recruiter signups
+- Job placement rate
+- Premium conversion rate
+
+---
+
+21. POTENTIAL PARTNERSHIPS
+
+Institutions
+
+- Universities
+- VETA
+- NACTVET
+
+Employers
+
+- Banks
+- Telecoms
+- NGOs
+- Airlines
+- Government agencies
+
+---
+
+22. FUTURE EXPANSION
+
+Future Opportunities
+
+- East African expansion
+- AI career coaching
+- LinkedIn integration
+- Scholarship CVs
+- Freelancer profiles
+- Portfolio websites
+- AI interview simulators
+
+---
+
+23. RISKS
+
+Risks
+
+- Fake information abuse
+- AI hallucination
+- Poor HR validation
+- Low recruiter adoption
+
+Mitigation
+
+- Human HR review
+- Verification systems
+- AI constraints
+- Employer partnerships
+
+---
+
+24. DEVELOPMENT ROADMAP
+
+PHASE 1 — MVP (6–8 Weeks)
+
+- Authentication
+- CV builder
+- AI rewriting
+- PDF export
+- Templates
+- HR scoring
+
+---
+
+PHASE 2 — Employability Layer (8–12 Weeks)
+
+- Job board
+- AI matching
+- Cover letters
+- Career dashboards
+
+---
+
+PHASE 3 — HR Ecosystem (12–16 Weeks)
+
+- Recruiter dashboards
+- AI filtering
+- University partnerships
+- Recruitment analytics
+
+---
+
+25. FINAL PRODUCT POSITIONING
+
+Recommended Brand Positioning
+
+“Built for Tanzanian graduates. Designed with HR intelligence.”
+
+Alternative Positioning
+
+“Tanzania’s Smart Employability Platform.”
+
+---
+
+26. FINAL CONCLUSION
+
+CVBora AI addresses one of Tanzania’s largest employment and graduate-readiness challenges by combining:
+
+- AI technology
+- Local HR intelligence
+- Employability standardization
+- Recruitment optimization
+
+The platform has the potential to evolve beyond CV generation into a full employment ecosystem powering Tanzania’s future workforce infrastructure.
