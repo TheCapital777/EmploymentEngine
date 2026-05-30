@@ -54,11 +54,21 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-2xl mb-6"
               >
-                {dict.home.heroTitle.split('Tanzania')[0]}Tanzania{dict.home.heroTitle.split('Tanzania')[1]}
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-                  {dict.home.heroTitle}
-                </span>
+                {lang === 'en' ? (
+                  <>
+                    Build a Winning CV for the <br className="hidden sm:block" />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                      Tanzanian Job Market
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Jenga CV Bora kwa ajili ya <br className="hidden sm:block" />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                      Soko la Ajira Tanzania
+                    </span>
+                  </>
+                )}
               </motion.h1>
               <motion.p 
                 initial={{ opacity: 0, y: 20 }}
@@ -74,14 +84,14 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center lg:justify-start"
               >
-                <Link href={`/${lang}/builder`} className="w-full sm:w-auto bg-primary text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-primary/30 hover:shadow-[0_0_40px_8px_rgba(59,130,246,0.3)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden">
+                <Link href={`/${lang}/builder`} className="w-full sm:w-auto bg-primary text-white px-6 py-3.5 md:px-8 md:py-4 rounded-xl text-base md:text-lg font-semibold shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-primary/30 hover:shadow-[0_0_40px_8px_rgba(59,130,246,0.3)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden">
                   <span className="relative z-10 flex items-center gap-2">
                     {dict.home.startBuildingNow}
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
                   <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] group-hover:animate-[shimmer_1.5s_infinite] z-0"></div>
                 </Link>
-                <Link href={`/${lang}/interview`} className="w-full sm:w-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-md text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-8 py-4 rounded-xl text-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all flex items-center justify-center gap-2">
+                <Link href={`/${lang}/interview`} className="w-full sm:w-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-md text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-6 py-3.5 md:px-8 md:py-4 rounded-xl text-base md:text-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all flex items-center justify-center gap-2">
                   <Mic className="w-5 h-5 text-slate-500" />
                   Practice Interview
                 </Link>
