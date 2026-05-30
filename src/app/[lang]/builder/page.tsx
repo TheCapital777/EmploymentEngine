@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useRef, Suspense } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Target, BookOpen, Briefcase, Zap, Award, Users, ChevronRight, ChevronLeft, Check, Sparkles, Loader2, Plus, Trash2, Download, CheckCircle, LayoutTemplate } from "lucide-react";
-import { enhanceObjective } from "../actions";
-import { CVTemplate, CVData } from "../../components/CVTemplate";
+import { User, Target, BookOpen, Briefcase, Zap, Award, Users, ChevronRight, ChevronLeft, Check, Sparkles, Loader2, Plus, Trash2, Download, CheckCircle, LayoutTemplate, MessageCircle, Crown } from "lucide-react";
+
+import { enhanceObjective } from "../../actions";
+import { CVTemplate, CVData } from "../../../components/CVTemplate";
 import { useReactToPrint } from "react-to-print";
-import { useAuth } from "../../context/AuthContext";
-import { db } from "../../lib/firebase/config";
+import { useAuth } from "../../../context/AuthContext";
+import { db } from "../../../lib/firebase/config";
 import { collection, addDoc, updateDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -30,14 +31,20 @@ const steps: Step[] = [
   { id: "referees", title: "Referees", icon: <Users className="w-5 h-5" /> },
 ];
 
+import { useDictionary } from "../../../context/DictionaryContext";
+
 function CVBuilderContent() {
+  const { dict, lang } = useDictionary();
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams?.get("id");
-  const { user } = useAuth();
+  const { user, userData, refreshUserData } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(!!editId);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  
+  const isPremium = userData?.premiumUntil ? Date.now() < userData.premiumUntil : false;
   
   const [formData, setFormData] = useState<CVData>({
     templateId: "modern",
@@ -51,37 +58,65 @@ function CVBuilderContent() {
   });
 
   const [isEnhancing, setIsEnhancing] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
-  import("react").then((React) => {
-    React.useEffect(() => {
-      if (editId && user) {
-        const fetchCV = async () => {
-          try {
-            const docRef = doc(db, "cvs", editId);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists() && docSnap.data().userId === user.uid) {
-              setFormData(docSnap.data().data);
-            } else {
-              alert("CV not found or unauthorized.");
-            }
-          } catch (e) {
-            console.error("Error fetching CV:", e);
-          } finally {
-            setIsLoading(false);
-          }
-        };
-        fetchCV();
-      } else if (editId && !user) {
-        setIsLoading(false); // Wait for auth
+  const [previewScale, setPreviewScale] = useState(0.85);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (previewContainerRef.current) {
+        const width = previewContainerRef.current.clientWidth;
+        // 210mm is ~794px, plus padding we want the layout to consider it takes ~860px
+        const scale = width / 860; 
+        setPreviewScale(Math.min(scale, 1.2));
       }
-    }, [editId, user]);
-  });
+    };
+    
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    if (previewContainerRef.current) {
+      observer.observe(previewContainerRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (editId && user) {
+      const fetchCV = async () => {
+        try {
+          const docRef = doc(db, "cvs", editId);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists() && docSnap.data().userId === user.uid) {
+            setFormData(docSnap.data().data);
+          } else {
+            alert("CV not found or unauthorized.");
+          }
+        } catch (e) {
+          console.error("Error fetching CV:", e);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchCV();
+    } else if (editId && !user) {
+      setIsLoading(false); // Wait for auth
+    }
+  }, [editId, user]);
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: `${formData.personal.fullName || "My"}_CV`,
   });
+
+  const handlePrintInterceptor = () => {
+    if (!isPremium) {
+      router.push(`/${lang}/pricing`);
+      return;
+    }
+    handlePrint();
+  };
 
   // Array Adders
   const addEducation = () => setFormData(prev => ({ ...prev, education: [...prev.education, { id: Date.now().toString(), institution: "", degree: "", year: "", gpa: "" }] }));
@@ -108,8 +143,8 @@ function CVBuilderContent() {
     try {
       const res = await enhanceObjective(formData.objective);
       if (res.success && res.text) {
-        setFormData(prev => ({ ...prev, objective: res.text }));
-        toast.success("Objective enhanced successfully!", { id: toastId });
+        setAiSuggestion(res.text);
+        toast.success("Enhancement ready to review!", { id: toastId });
       } else {
         toast.error(res.error || "Failed to enhance.", { id: toastId });
       }
@@ -154,6 +189,14 @@ function CVBuilderContent() {
   };
 
   const nextStep = () => {
+    // Validation for Personal Info step
+    if (steps[currentStepIndex].id === "personal") {
+      if (!formData.personal.fullName.trim() || !formData.personal.email.trim() || !formData.personal.phone.trim()) {
+        toast.error("Please fill in your Full Name, Email, and Phone before proceeding.");
+        return;
+      }
+    }
+    
     if (currentStepIndex < steps.length - 1) {
       setCurrentStepIndex(prev => prev + 1);
     }
@@ -176,43 +219,58 @@ function CVBuilderContent() {
   }
 
   return (
-    <div className="flex-1 bg-slate-50 dark:bg-slate-950 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Header & Progress */}
-        <div className="mb-12">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Smart CV Builder</h1>
-          <p className="text-slate-600 dark:text-slate-400">Complete the sections below to generate your ATS-optimized CV.</p>
+    <div className="flex-1 bg-slate-50 dark:bg-slate-950 py-8 md:py-12">
+      <div className="container mx-auto px-4 max-w-7xl">
+        {/* Header & Progress moved outside grid for perfect vertical alignment */}
+        <div className="mb-12 max-w-4xl mx-auto px-4 md:px-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Smart CV Builder</h1>
+            <p className="text-slate-600 dark:text-slate-400">Complete the sections below to generate your ATS-optimized CV.</p>
+          </div>
           
-          <div className="mt-8 flex items-center justify-between relative">
+          <div className="flex items-center justify-between relative max-w-2xl mx-auto">
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-full z-0"></div>
             <div 
-              className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary rounded-full z-0 transition-all duration-500"
+              className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary rounded-full z-0 transition-all duration-500 ease-out"
               style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
             ></div>
             
             {steps.map((step, index) => {
               const isCompleted = index < currentStepIndex;
               const isCurrent = index === currentStepIndex;
+              
+              let translatedTitle = step.title;
+              if (step.id === "personal") translatedTitle = dict.builder.stepPersonal;
+              else if (step.id === "objective") translatedTitle = dict.builder.stepObjective;
+              else if (step.id === "education") translatedTitle = dict.builder.stepEducation;
+              else if (step.id === "experience") translatedTitle = dict.builder.stepExperience;
+              else if (step.id === "skills") translatedTitle = dict.builder.stepSkills;
+              
               return (
                 <div key={step.id} className="relative z-10 flex flex-col items-center gap-2">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
-                    isCompleted ? 'bg-primary border-primary text-white' : 
-                    isCurrent ? 'bg-white dark:bg-slate-900 border-primary text-primary' : 
-                    'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-400'
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                    isCompleted ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105' : 
+                    isCurrent ? 'bg-white dark:bg-slate-900 border-primary text-primary shadow-md scale-110' : 
+                    'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-400 hover:border-slate-400'
                   }`}>
                     {isCompleted ? <Check className="w-5 h-5" /> : step.icon}
                   </div>
-                  <span className={`hidden md:block text-xs font-medium absolute -bottom-6 whitespace-nowrap ${
+                  <span className={`hidden md:block text-xs font-medium absolute -bottom-6 whitespace-nowrap transition-colors duration-300 ${
                     isCurrent ? 'text-primary' : 'text-slate-500'
-                  }`}>{step.title}</span>
+                  }`}>{translatedTitle}</span>
                 </div>
               );
             })}
           </div>
         </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Left Column: Form Wizard */}
+          <div className="lg:col-span-6 xl:col-span-5 flex flex-col">
+
         {/* Form Container */}
-        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-200/50 dark:border-slate-800/50 p-6 md:p-10 min-h-[400px] flex flex-col relative overflow-hidden">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-200/50 dark:border-slate-800/50 p-6 md:p-10 min-h-[400px] flex flex-col relative overflow-hidden transition-all duration-300">
           <div className="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div className="p-2 bg-primary/10 text-primary rounded-lg">
               {currentStep.icon}
@@ -278,7 +336,10 @@ function CVBuilderContent() {
                         </div>
                         <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                           <div>
-                            <h3 className="font-bold text-slate-900 dark:text-white">Executive</h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-bold text-slate-900 dark:text-white">Executive</h3>
+                              <span className="bg-amber-100 text-amber-700 border border-amber-200 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Premium</span>
+                            </div>
                             <p className="text-xs text-slate-500">Traditional, serif, navy</p>
                           </div>
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center ${formData.templateId === "executive" ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800 text-transparent'}`}>
@@ -325,11 +386,11 @@ function CVBuilderContent() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Full Name</label>
-                      <input type="text" value={formData.personal.fullName} onChange={(e) => setFormData(p => ({...p, personal: {...p.personal, fullName: e.target.value}}))} placeholder="e.g. John Doe" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" />
+                      <input type="text" value={formData.personal.fullName} onChange={(e) => setFormData(p => ({...p, personal: {...p.personal, fullName: e.target.value}}))} placeholder="e.g. Amani Njoroge" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</label>
-                      <input type="email" value={formData.personal.email} onChange={(e) => setFormData(p => ({...p, personal: {...p.personal, email: e.target.value}}))} placeholder="john@example.com" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" />
+                      <input type="email" value={formData.personal.email} onChange={(e) => setFormData(p => ({...p, personal: {...p.personal, email: e.target.value}}))} placeholder="amani@example.com" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Phone Number</label>
@@ -355,24 +416,73 @@ function CVBuilderContent() {
                         <strong>AI Assistant:</strong> I can help you write a powerful career objective. Just enter a few keywords about your goals and experience, and I'll generate a professional summary tailored for Tanzanian HR standards.
                       </p>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Career Objective / Professional Summary</label>
                       <textarea 
                         rows={5} 
                         placeholder="I am a recent graduate seeking a position in..." 
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
                         value={formData.objective}
-                        onChange={(e) => setFormData(prev => ({ ...prev, objective: e.target.value }))}
+                        onChange={(e) => {
+                          setFormData(prev => ({ ...prev, objective: e.target.value }));
+                          if (aiSuggestion) setAiSuggestion(null);
+                        }}
                       />
                     </div>
-                    <button 
-                      onClick={handleEnhance}
-                      disabled={isEnhancing || !formData.objective}
-                      className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
-                    >
-                      {isEnhancing ? <Loader2 className="w-4 h-4 text-primary animate-spin" /> : <Sparkles className="w-4 h-4 text-primary" />}
-                      {isEnhancing ? "Enhancing..." : "Enhance with AI"}
-                    </button>
+
+                    <AnimatePresence>
+                      {aiSuggestion && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10, height: 0 }}
+                          animate={{ opacity: 1, y: 0, height: 'auto' }}
+                          exit={{ opacity: 0, y: -10, height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="p-5 mt-2 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-900 border border-green-200 dark:border-green-900/50 shadow-sm relative">
+                            <div className="absolute top-0 right-0 p-4">
+                              <span className="flex h-3 w-3 relative">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                              </span>
+                            </div>
+                            <h4 className="text-sm font-bold text-green-800 dark:text-green-400 mb-2 flex items-center gap-2">
+                              <Sparkles className="w-4 h-4" /> AI Suggestion
+                            </h4>
+                            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                              {aiSuggestion}
+                            </p>
+                            <div className="flex flex-wrap gap-3">
+                              <button
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, objective: aiSuggestion }));
+                                  setAiSuggestion(null);
+                                }}
+                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 shadow-sm shadow-green-600/20"
+                              >
+                                <Check className="w-4 h-4" /> {dict.builder.acceptEnhancement}
+                              </button>
+                              <button
+                                onClick={() => setAiSuggestion(null)}
+                                className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium rounded-lg transition-colors"
+                              >
+                                {dict.builder.discard}
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {!aiSuggestion && (
+                      <button 
+                        onClick={handleEnhance}
+                        disabled={isEnhancing || !formData.objective}
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                      >
+                        {isEnhancing ? <Loader2 className="w-4 h-4 text-primary animate-spin" /> : <Sparkles className="w-4 h-4 text-primary" />}
+                        {isEnhancing ? "Enhancing..." : dict.builder.enhanceWithAi}
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -448,25 +558,50 @@ function CVBuilderContent() {
                       <div key={ref.id} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 relative">
                         <button onClick={() => removeReferee(ref.id)} className="absolute top-4 right-4 text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors"><Trash2 className="w-4 h-4" /></button>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div><label className="text-xs font-medium mb-1 block">Full Name</label><input type="text" value={ref.name} onChange={(e) => updateReferee(ref.id, 'name', e.target.value)} className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none focus:ring-1 focus:ring-primary" placeholder="Dr. Jane Doe" /></div>
+                          <div><label className="text-xs font-medium mb-1 block">Full Name</label><input type="text" value={ref.name} onChange={(e) => updateReferee(ref.id, 'name', e.target.value)} className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none focus:ring-1 focus:ring-primary" placeholder="Dr. Grace Mbeki" /></div>
                           <div><label className="text-xs font-medium mb-1 block">Position / Title</label><input type="text" value={ref.position} onChange={(e) => updateReferee(ref.id, 'position', e.target.value)} className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none focus:ring-1 focus:ring-primary" placeholder="Professor" /></div>
                           <div><label className="text-xs font-medium mb-1 block">Organization</label><input type="text" value={ref.organization} onChange={(e) => updateReferee(ref.id, 'organization', e.target.value)} className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none focus:ring-1 focus:ring-primary" placeholder="University of Dar es Salaam" /></div>
-                          <div><label className="text-xs font-medium mb-1 block">Contact (Email/Phone)</label><input type="text" value={ref.contact} onChange={(e) => updateReferee(ref.id, 'contact', e.target.value)} className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none focus:ring-1 focus:ring-primary" placeholder="jane.doe@udsm.ac.tz" /></div>
+                          <div><label className="text-xs font-medium mb-1 block">Contact (Email/Phone)</label><input type="text" value={ref.contact} onChange={(e) => updateReferee(ref.id, 'contact', e.target.value)} className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 outline-none focus:ring-1 focus:ring-primary" placeholder="grace.mbeki@udsm.ac.tz" /></div>
                         </div>
                       </div>
                     ))}
                     <button onClick={addReferee} className="flex items-center gap-2 text-primary text-sm font-medium hover:underline"><Plus className="w-4 h-4" /> Add Referee</button>
                     
-                    {/* The final submit/print preview section on Step 7 */}
                     <div className="mt-8 p-6 bg-primary/5 border border-primary/10 rounded-xl text-center">
                       <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Ready to generate?</h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Make sure you've filled out all relevant sections. Click below to download your ATS-ready PDF.</p>
-                      <button 
-                        onClick={() => handlePrint()}
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium bg-primary text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
-                      >
-                        <Download className="w-5 h-5" /> Download PDF CV
-                      </button>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">Make sure you've filled out all relevant sections. Click below to download your ATS-ready PDF.</p>
+                      
+                      <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+                        <button 
+                          onClick={handlePrintInterceptor}
+                          className="inline-flex items-center justify-center w-full md:w-auto gap-2 px-8 py-3.5 rounded-xl font-bold bg-primary text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
+                        >
+                          <Download className="w-5 h-5" /> {dict.builder.downloadPdf}
+                        </button>
+                        
+                        {isPremium && (
+                          <button 
+                            onClick={() => {
+                              const text = encodeURIComponent("Here is a link to my CV! Let me know if you need anything else.");
+                              window.open(`https://wa.me/?text=${text}`, "_blank");
+                            }}
+                            className="inline-flex items-center justify-center w-full md:w-auto gap-2 px-8 py-3.5 rounded-xl font-bold bg-[#25D366] text-white shadow-lg shadow-[#25D366]/20 hover:shadow-xl hover:shadow-[#25D366]/30 hover:-translate-y-0.5 transition-all"
+                          >
+                            <MessageCircle className="w-5 h-5" /> Share via WhatsApp
+                          </button>
+                        )}
+                      </div>
+
+                      {!isPremium && (
+                        <div className="mt-6 pt-6 border-t border-primary/10">
+                          <button 
+                            onClick={() => router.push(`/${lang}/pricing`)}
+                            className="inline-flex items-center gap-2 text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors"
+                          >
+                            <Crown className="w-4 h-4" /> Upgrade to Premium (10,000 TZS)
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -481,7 +616,7 @@ function CVBuilderContent() {
               disabled={currentStepIndex === 0}
               className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronLeft className="w-5 h-5" /> Back
+              <ChevronLeft className="w-5 h-5" /> {dict.builder.prevStep}
             </button>
             {currentStepIndex === steps.length - 1 ? (
               <button 
@@ -497,17 +632,45 @@ function CVBuilderContent() {
                 onClick={nextStep}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium bg-primary text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
               >
-                Next Step <ChevronRight className="w-5 h-5" />
+                {dict.builder.nextStep} <ChevronRight className="w-5 h-5" />
               </button>
             )}
           </div>
+            </div>
+          </div>
+
+          {/* Right Column: Live Preview */}
+          <div className="hidden lg:block lg:col-span-6 xl:col-span-7 sticky top-24 h-[calc(100vh-8rem)]">
+            <div 
+              ref={previewContainerRef}
+              className="w-full h-full bg-slate-200/50 dark:bg-slate-800/50 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden relative shadow-inner transition-all duration-300"
+            >
+              <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 md:p-8 flex justify-center custom-scrollbar">
+                <div 
+                  className="origin-top transition-transform duration-300 ease-out"
+                  style={{ 
+                    transform: `scale(${previewScale})`,
+                    width: '210mm',
+                    marginBottom: `calc(-297mm * (1 - ${previewScale}))` 
+                  }}
+                >
+                  <div className="shadow-2xl ring-1 ring-slate-900/5 bg-white min-h-[297mm] overflow-hidden rounded-sm transition-all duration-300">
+                    <CVTemplate data={formData} isPremium={isPremium} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
         </div>
       </div>
 
       {/* Hidden PDF Template Container */}
       <div className="hidden">
-        <CVTemplate ref={printRef} data={formData} />
+        <CVTemplate ref={printRef} data={formData} isPremium={isPremium} />
       </div>
+
+
     </div>
   );
 }

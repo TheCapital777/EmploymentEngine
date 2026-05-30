@@ -46,7 +46,7 @@ export default function PaywallModal({ isOpen, onClose, featureName }: { isOpen:
                 </div>
                 <div className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                  <span>AI Interview Preparation</span>
+                  <span>Extended AI Interviews & Custom Uploads</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />

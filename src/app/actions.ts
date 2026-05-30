@@ -179,3 +179,102 @@ export async function generateInterviewPrep(cvData: any) {
     return { error: "Failed to generate interview prep." };
   }
 }
+
+export async function parsePdfDocument(base64Data: string) {
+  try {
+    const pdfParse = require('pdf-parse');
+    const buffer = Buffer.from(base64Data, 'base64');
+    const data = await pdfParse(buffer);
+    return { success: true, text: data.text };
+  } catch (error) {
+    console.error("PDF Parse Error:", error);
+    return { error: "Failed to parse PDF document." };
+  }
+}
+
+export async function processInterviewStep(sourceText: string, chatHistory: any[], isComplete: boolean) {
+  try {
+    const prompt = `
+    You are an expert HR Manager and Interview Coach in Tanzania conducting an interview.
+    You are interviewing a candidate based on the following source text (which could be a CV or a custom document).
+    Source Text:
+    "${sourceText}"
+    
+    Here is the conversation history so far:
+    ${JSON.stringify(chatHistory)}
+    
+    Instructions:
+    1. If the history contains a recent answer from the user, evaluate it. Give it a score out of 10, and constructive feedback on how to improve.
+    2. If the interview is NOT complete (isComplete = false), generate the NEXT interview question. Make it relevant to their source text and previous answers.
+    3. If the interview IS complete (isComplete = true), do NOT generate a new question, just give final overall feedback.
+    
+    Return ONLY a JSON object with this exact format:
+    {
+      "evaluation": {
+        "score": 8,
+        "feedback": "Your answer was good but..." // Only include if evaluating an answer. Omit if this is the very first question.
+      },
+      "nextQuestion": "Tell me about..." // Only include if isComplete is false
+    }
+    `;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        temperature: 0.6,
+        responseMimeType: "application/json",
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}");
+    return { success: true, data: result };
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    return { error: "Failed to process interview step." };
+  }
+}
+
+export async function createSnippeSession(userId: string) {
+  try {
+    const SNIPPE_API_KEY = process.env.SNIPPE_API_KEY;
+    if (!SNIPPE_API_KEY) {
+      throw new Error("SNIPPE_API_KEY is not configured.");
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    const response = await fetch("https://api.snippe.sh/api/v1/sessions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${SNIPPE_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        amount: 10000,
+        currency: "TZS",
+        allowed_methods: ["mobile_money", "card"],
+        redirect_url: `${baseUrl}/dashboard?payment=success`,
+        webhook_url: `${baseUrl}/api/webhooks/snippe`,
+        description: "Employment Engine Premium (30 Days)",
+        metadata: {
+          customer_id: userId
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Snippe Session Error:", errorData);
+      throw new Error("Failed to create payment session.");
+    }
+
+    const data = await response.json();
+    return { success: true, url: data.checkout_url || data.url || data.session_url };
+  } catch (error: any) {
+    console.error("Payment action error:", error);
+    return { error: error.message || "An unexpected error occurred." };
+  }
+}
+
+

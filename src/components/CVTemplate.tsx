@@ -38,9 +38,10 @@ export type CVData = {
 
 interface CVTemplateProps {
   data: CVData;
+  isPremium?: boolean;
 }
 
-export const CVTemplate = React.forwardRef<HTMLDivElement, CVTemplateProps>(({ data }, ref) => {
+export const CVTemplate = React.forwardRef<HTMLDivElement, CVTemplateProps>(({ data, isPremium = false }, ref) => {
   const templateId = data.templateId || "modern";
 
   if (templateId === "executive") {
@@ -134,13 +135,18 @@ export const CVTemplate = React.forwardRef<HTMLDivElement, CVTemplateProps>(({ d
             </div>
           </div>
         )}
+        {!isPremium && (
+          <div className="absolute bottom-4 left-0 right-0 text-center opacity-40 select-none pointer-events-none">
+            <span className="text-xs font-bold tracking-widest text-slate-400">Created for free at EmploymentEngine</span>
+          </div>
+        )}
       </div>
     );
   }
 
   if (templateId === "minimalist") {
     return (
-      <div ref={ref} className="bg-white text-slate-800 p-12 font-sans" style={{ width: '100%', minHeight: '100%', maxWidth: '210mm', margin: '0 auto' }}>
+      <div ref={ref} className="bg-white text-slate-800 p-12 font-sans relative" style={{ width: '100%', minHeight: '100%', maxWidth: '210mm', margin: '0 auto' }}>
         <div className="mb-10">
           <h1 className="text-4xl font-light tracking-tight text-slate-900 mb-4">{data.personal.fullName || "Your Name"}</h1>
           <div className="text-sm flex flex-col gap-1 text-slate-500">
@@ -225,13 +231,18 @@ export const CVTemplate = React.forwardRef<HTMLDivElement, CVTemplateProps>(({ d
             )}
           </div>
         </div>
+        {!isPremium && (
+          <div className="absolute bottom-4 left-0 right-0 text-center opacity-40 select-none pointer-events-none">
+            <span className="text-xs font-bold tracking-widest uppercase text-slate-400">Created for free at EmploymentEngine</span>
+          </div>
+        )}
       </div>
     );
   }
 
-  // default: modern
+  // Modern Template
   return (
-    <div ref={ref} className="bg-white text-black p-10 font-sans" style={{ width: '100%', minHeight: '100%', maxWidth: '210mm', margin: '0 auto' }}>
+    <div ref={ref} className="bg-white text-black min-h-full font-sans relative" style={{ width: '100%', minHeight: '100%', maxWidth: '210mm', margin: '0 auto' }}>
       <div className="text-center mb-6 pb-4">
         <h1 className="text-4xl font-bold tracking-tight text-green-700 mb-2">{data.personal.fullName || "Your Name"}</h1>
         <div className="text-sm flex flex-wrap justify-center gap-2 text-slate-600">

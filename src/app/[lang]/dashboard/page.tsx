@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { FileText, Plus, FileSignature, Trash2, Loader2, ArrowRight, TrendingUp, Briefcase, Award, Mic, Star, AlertCircle, Clock } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
-import { db } from "../../lib/firebase/config";
+import { useAuth } from "../../../context/AuthContext";
+import { db } from "../../../lib/firebase/config";
 import { collection, query, where, getDocs, deleteDoc, doc } from "firebase/firestore";
 import Link from "next/link";
-import { analyzeProfileReadiness } from "../actions";
-import InterviewPrepModal from "../../components/InterviewPrepModal";
-import PaywallModal from "../../components/PaywallModal";
+import { analyzeProfileReadiness } from "../../actions";
+import InterviewPrepModal from "../../../components/InterviewPrepModal";
+import PaywallModal from "../../../components/PaywallModal";
+import { useDictionary } from "../../../context/DictionaryContext";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  const router = useRouter();
+  const { lang } = useDictionary();
   const { user, loading: authLoading } = useAuth();
   const [cvs, setCvs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +23,6 @@ export default function Dashboard() {
   const [analyzingStats, setAnalyzingStats] = useState(false);
   const [prepModalOpen, setPrepModalOpen] = useState(false);
   const [selectedCvForPrep, setSelectedCvForPrep] = useState<any>(null);
-  const [paywallOpen, setPaywallOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -145,15 +148,15 @@ export default function Dashboard() {
             <p className="text-slate-600 dark:text-slate-400">Here's a summary of your employability profile.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button onClick={() => setPaywallOpen(true)} className="flex items-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-xl font-medium shadow-md shadow-amber-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+            <Link href={`/${lang}/pricing`} className="flex items-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-xl font-medium shadow-md shadow-amber-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all">
               <Star className="w-5 h-5" />
               Upgrade to Pro
-            </button>
-            <Link href="/cover-letter" className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl font-medium shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-              <FileText className="w-5 h-5" />
-              Cover Letter
             </Link>
-            <Link href="/builder" className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-medium shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all">
+            <Link href={`/${lang}/interview`} className="flex items-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+              <Mic className="w-5 h-5" />
+              Practice Interview
+            </Link>
+            <Link href={`/${lang}/builder`} className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-medium shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all">
               <Plus className="w-5 h-5" />
               Create New CV
             </Link>
@@ -249,9 +252,13 @@ export default function Dashboard() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-md">ATS Score: 85%</span>
                     <button 
-                      onClick={(e) => handleOpenPrep(e, cv.data)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        router.push(`/${lang}/interview`);
+                      }}
                       className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-md transition-colors mr-1"
-                      title="AI Interview Prep"
+                      title="AI Interview Simulator"
                     >
                       <Mic className="w-4 h-4" />
                     </button>

@@ -1,0 +1,57 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "success": "Success",
+    "error": "Error"
+  },
+  "header": {
+    "features": "Features",
+    "howItWorks": "How It Works",
+    "pricing": "Pricing",
+    "buildMyCv": "Build My CV",
+    "dashboard": "Dashboard",
+    "signOut": "Sign Out",
+    "signIn": "Sign In"
+  },
+  "home": {
+    "heroTitle": "Build a Winning CV for the Tanzanian Job Market",
+    "heroSubtitle": "Our AI-powered platform helps you craft professional, ATS-friendly CVs that stand out to top employers in Tanzania and East Africa.",
+    "startBuildingNow": "Start Building Now",
+    "whyChoose": "Why Choose JengaCV?",
+    "whyChooseSubtitle": "Our platform combines cutting-edge Gemini AI with deep local recruitment knowledge to give you the competitive edge.",
+    "features": [
+      {
+        "title": "ATS Optimization",
+        "description": "Ensure your CV passes through automated Applicant Tracking Systems used by top Tanzanian employers."
+      },
+      {
+        "title": "Industry Specific",
+        "description": "Tailored phrasing and keywords for Banking, Telecoms, NGOs, and Government sectors."
+      },
+      {
+        "title": "HR-Approved Standards",
+        "description": "Formats and structures verified by leading human resource professionals in East Africa."
+      }
+    ]
+  },
+  "builder": {
+    "stepPersonal": "Personal Info",
+    "stepObjective": "Objective",
+    "stepExperience": "Experience",
+    "stepEducation": "Education",
+    "stepSkills": "Skills",
+    "stepPreview": "Preview & Download",
+    "nextStep": "Next Step",
+    "prevStep": "Previous Step",
+    "downloadPdf": "Download PDF",
+    "livePreview": "Live CV Preview",
+    "enhanceWithAi": "Enhance with AI",
+    "aiSuggestion": "AI Suggestion",
+    "acceptEnhancement": "Accept Enhancement",
+    "discard": "Discard"
+  }
+}

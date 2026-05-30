@@ -1,0 +1,57 @@
+{
+  "common": {
+    "loading": "Inapakia...",
+    "save": "Hifadhi",
+    "cancel": "Ghairi",
+    "edit": "Hariri",
+    "delete": "Futa",
+    "success": "Imefanikiwa",
+    "error": "Hitilafu"
+  },
+  "header": {
+    "features": "Vipengele",
+    "howItWorks": "Inavyofanya Kazi",
+    "pricing": "Gharama",
+    "buildMyCv": "Tengeneza CV Yangu",
+    "dashboard": "Dashibodi",
+    "signOut": "Toka",
+    "signIn": "Ingia"
+  },
+  "home": {
+    "heroTitle": "Tengeneza CV Bora kwa Soko la Ajira Tanzania",
+    "heroSubtitle": "Jukwaa letu linalotumia AI linakusaidia kuandaa CV za kitaalamu zinazokidhi viwango vya ATS ili kung'aa kwa waajiri wakubwa Tanzania na Afrika Mashariki.",
+    "startBuildingNow": "Anza Kutengeneza Sasa",
+    "whyChoose": "Kwa nini Uchague JengaCV?",
+    "whyChooseSubtitle": "Jukwaa letu linaunganisha teknolojia ya kisasa ya Gemini AI na uelewa wa kina wa uajiri wa ndani ili kukupa makali ya ushindani.",
+    "features": [
+      {
+        "title": "Uboreshaji wa ATS",
+        "description": "Hakikisha CV yako inapitishwa na Mifumo ya Kielektroniki ya Kuchuja Waombaji (ATS) inayotumiwa na waajiri wakubwa Tanzania."
+      },
+      {
+        "title": "Kulingana na Sekta",
+        "description": "Maneno na misemo maalum iliyoundwa kwa ajili ya sekta za Benki, Mawasiliano, Mashirika yasiyo ya Kiserikali (NGOs), na Serikali."
+      },
+      {
+        "title": "Viwango Vinavyokubalika na HR",
+        "description": "Mifumo na miundo iliyothibitishwa na wataalamu wakuu wa rasilimali watu Afrika Mashariki."
+      }
+    ]
+  },
+  "builder": {
+    "stepPersonal": "Taarifa Binafsi",
+    "stepObjective": "Malengo",
+    "stepExperience": "Uzoefu",
+    "stepEducation": "Elimu",
+    "stepSkills": "Ujuzi",
+    "stepPreview": "Hakiki & Pakua",
+    "nextStep": "Hatua Inayofuata",
+    "prevStep": "Hatua Iliyopita",
+    "downloadPdf": "Pakua PDF",
+    "livePreview": "Hakiki ya CV (Mubashara)",
+    "enhanceWithAi": "Boresha na AI",
+    "aiSuggestion": "Pendekezo la AI",
+    "acceptEnhancement": "Kubali Maboresho",
+    "discard": "Tupa"
+  }
+}

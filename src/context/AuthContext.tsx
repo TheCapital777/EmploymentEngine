@@ -2,37 +2,74 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, User, signInWithPopup, signInWithCredential, GoogleAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { auth, googleProvider } from "../lib/firebase/config";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { auth, googleProvider, db } from "../lib/firebase/config";
+
+export interface UserData {
+  premiumUntil?: number;
+}
 
 interface AuthContextType {
   user: User | null;
+  userData: UserData | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithGoogleOneTap: (credential: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUserData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  userData: null,
   loading: true,
   signInWithGoogle: async () => {},
   signInWithGoogleOneTap: async () => {},
   signUpWithEmail: async () => {},
   signInWithEmail: async () => {},
   logout: async () => {},
+  refreshUserData: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const refreshUserData = async () => {
+    if (user) {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setUserData(docSnap.data() as UserData);
+      } else {
+        await setDoc(docRef, { createdAt: Date.now() }, { merge: true });
+        setUserData({});
+      }
+    } else {
+      setUserData(null);
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        const docRef = doc(db, "users", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setUserData(docSnap.data() as UserData);
+        } else {
+          await setDoc(docRef, { createdAt: Date.now() }, { merge: true });
+          setUserData({});
+        }
+      } else {
+        setUserData(null);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
@@ -75,7 +112,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithGoogleOneTap, signUpWithEmail, signInWithEmail, logout }}>
+    <AuthContext.Provider value={{ user, userData, loading, signInWithGoogle, signInWithGoogleOneTap, signUpWithEmail, signInWithEmail, logout, refreshUserData }}>
       {children}
     </AuthContext.Provider>
   );

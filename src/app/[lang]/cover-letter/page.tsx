@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { db } from "../../lib/firebase/config";
+import { useAuth } from "../../../context/AuthContext";
+import { db } from "../../../lib/firebase/config";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { generateCoverLetter } from "../actions";
+import { generateCoverLetter } from "../../actions";
 import { Loader2, Send, Copy, Check } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
