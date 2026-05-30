@@ -8,7 +8,6 @@ import { collection, query, where, getDocs, deleteDoc, doc } from "firebase/fire
 import Link from "next/link";
 import { analyzeProfileReadiness } from "../../actions";
 import InterviewPrepModal from "../../../components/InterviewPrepModal";
-import PaywallModal from "../../../components/PaywallModal";
 import { useDictionary } from "../../../context/DictionaryContext";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -289,12 +288,6 @@ export default function Dashboard() {
         cvData={selectedCvForPrep} 
         isOpen={prepModalOpen} 
         onClose={() => setPrepModalOpen(false)} 
-      />
-
-      <PaywallModal 
-        isOpen={paywallOpen} 
-        onClose={() => setPaywallOpen(false)} 
-        featureName="Pro Plan"
       />
     </div>
   );
