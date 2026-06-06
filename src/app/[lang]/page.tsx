@@ -148,11 +148,11 @@ export default function Home() {
                 <Link
                   href={`/${lang}/builder`}
                   id="hero-cta-build"
-                  className="group relative overflow-hidden w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-white px-8 py-4 rounded-2xl text-base font-semibold shadow-[var(--shadow-primary)] hover:shadow-[var(--shadow-primary-lg)] hover:-translate-y-1 transition-all duration-300"
+                  className="group relative overflow-hidden w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-white px-6 py-3.5 sm:px-8 sm:py-4 rounded-2xl text-sm sm:text-base font-semibold shadow-[var(--shadow-primary)] hover:shadow-[var(--shadow-primary-lg)] hover:-translate-y-1 transition-all duration-300"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     {dict.home.startBuildingNow}
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-200" />
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-primary via-blue-500 to-primary bg-[length:200%] group-hover:bg-right transition-all duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 z-[1]" />
@@ -161,9 +161,9 @@ export default function Home() {
                 <Link
                   href={`/${lang}/interview`}
                   id="hero-cta-interview"
-                  className="group w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-base font-medium text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-white/[0.06] border border-slate-200 dark:border-white/10 backdrop-blur-sm hover:bg-white dark:hover:bg-white/[0.10] hover:border-slate-300 dark:hover:border-white/20 hover:-translate-y-0.5 transition-all duration-200"
+                  className="group w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 rounded-2xl text-sm sm:text-base font-medium text-slate-700 dark:text-slate-200 bg-white/80 dark:bg-white/[0.06] border border-slate-200 dark:border-white/10 backdrop-blur-sm hover:bg-white dark:hover:bg-white/[0.10] hover:border-slate-300 dark:hover:border-white/20 hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  <Mic className="w-5 h-5 text-slate-500 group-hover:text-primary transition-colors" />
+                  <Mic className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 group-hover:text-primary transition-colors" />
                   Practice Interview
                 </Link>
               </motion.div>
@@ -481,10 +481,9 @@ export default function Home() {
                   {TRUST_LOGOS.map((logo, i) => (
                     <div
                       key={`${arrIdx}-${i}`}
-                      className="relative opacity-50 hover:opacity-90 transition-all duration-300 grayscale hover:grayscale-0 shrink-0"
-                      style={{ width: logo.w, height: logo.h }}
+                      className="relative opacity-50 hover:opacity-90 transition-all duration-300 grayscale hover:grayscale-0 shrink-0 w-40 md:w-48 h-16 md:h-20"
                     >
-                      <Image src={logo.src} alt={logo.alt} fill sizes="160px" className="object-contain" />
+                      <Image src={logo.src} alt={logo.alt} fill sizes="(max-width: 768px) 160px, 192px" className="object-contain" />
                     </div>
                   ))}
                 </div>

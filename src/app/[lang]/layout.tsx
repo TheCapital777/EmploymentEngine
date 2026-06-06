@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "../globals.css";
 import Image from "next/image";
 import { AuthProvider } from "../../context/AuthContext";
@@ -7,18 +6,6 @@ import Header from "../../components/Header";
 import { Toaster } from 'react-hot-toast';
 import { getDictionary } from "../../lib/dictionaries";
 import { DictionaryProvider } from "../../context/DictionaryContext";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "CVBora AI | Tanzania's Smart Employability Platform",
@@ -38,8 +25,13 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} className="scroll-smooth">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      </head>
       <body
-        className={`${inter.variable} ${plusJakartaSans.variable} font-sans antialiased min-h-screen flex flex-col bg-background text-foreground`}
+        className="font-sans antialiased min-h-screen flex flex-col bg-background text-foreground"
       >
         <AuthProvider>
           <DictionaryProvider dict={dict} lang={lang}>

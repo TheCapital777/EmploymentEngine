@@ -32,6 +32,7 @@ export default function Header() {
     { href: `/${lang}/#features`, label: dict.header.features },
     { href: `/${lang}/#how-it-works`, label: dict.header.howItWorks },
     { href: `/${lang}/pricing`, label: dict.header.pricing },
+    { href: `/${lang}/interview`, label: "Interview Prep" },
   ];
 
   return (
@@ -142,7 +143,7 @@ export default function Header() {
         {/* Mobile Nav Dropdown */}
         <div
           className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${
-            mobileOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
+            mobileOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
           } bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200/60 dark:border-white/[0.06]`}
         >
           <div className="container mx-auto px-4 py-4 flex flex-col gap-1">
@@ -156,14 +157,37 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            {user && (
+            
+            <div className="h-px bg-slate-200/60 dark:bg-white/[0.06] my-2" />
+
+            {user ? (
+              <>
+                <Link
+                  href={`/${lang}/dashboard`}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-primary px-3 py-2.5 rounded-lg hover:bg-primary/5 transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  {dict.header.dashboard}
+                </Link>
+                <button
+                  onClick={() => {
+                    logout();
+                    setMobileOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full text-sm font-medium text-slate-500 hover:text-red-500 px-3 py-2.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  {dict.header.signOut}
+                </button>
+              </>
+            ) : (
               <Link
-                href={`/${lang}/dashboard`}
+                href={`/${lang}/login`}
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-primary px-3 py-2.5 rounded-lg hover:bg-primary/5 transition-colors"
+                className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-primary px-3 py-2.5 rounded-lg hover:bg-primary/5 transition-colors"
               >
-                <LayoutDashboard className="w-4 h-4" />
-                {dict.header.dashboard}
+                {dict.header.signIn}
               </Link>
             )}
           </div>
