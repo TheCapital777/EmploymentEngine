@@ -111,10 +111,6 @@ function CVBuilderContent() {
   });
 
   const handlePrintInterceptor = () => {
-    if (!isPremium) {
-      router.push(`/${lang}/pricing`);
-      return;
-    }
     handlePrint();
   };
 
@@ -298,62 +294,58 @@ function CVBuilderContent() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       
                       {/* Modern Template */}
-                      <div 
+                      <div
                         onClick={() => setFormData(p => ({ ...p, templateId: "modern" }))}
-                        className={`cursor-pointer rounded-2xl border-2 transition-all overflow-hidden ${formData.templateId === "modern" || !formData.templateId ? 'border-primary shadow-md shadow-primary/20 scale-[1.02]' : 'border-slate-200 dark:border-slate-800 hover:border-primary/50'}`}
+                        className={`cursor-pointer rounded-2xl border-2 transition-all overflow-hidden ${formData.templateId === "modern" || !formData.templateId ? 'border-primary shadow-md shadow-primary/20' : 'border-slate-200 dark:border-slate-800 hover:border-primary/50'}`}
                       >
-                        <div className="h-32 bg-slate-100 flex items-center justify-center p-4">
+                        <div className="h-32 bg-slate-100 flex items-center justify-center p-4 relative">
                            <div className="w-full h-full bg-white shadow-sm flex flex-col p-2 gap-2">
                              <div className="w-1/2 h-2 bg-green-700 rounded-sm mx-auto"></div>
                              <div className="w-8 h-0.5 bg-green-600"></div>
                              <div className="w-full h-1 bg-slate-200 rounded-sm"></div>
                              <div className="w-3/4 h-1 bg-slate-200 rounded-sm"></div>
                            </div>
+                           <div className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-opacity ${formData.templateId === "modern" || !formData.templateId ? 'bg-primary text-white opacity-100' : 'bg-white/90 opacity-0'}`}>
+                             <Check className="w-4 h-4" />
+                           </div>
                         </div>
-                        <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                          <div>
-                            <h3 className="font-bold text-slate-900 dark:text-white">Modern</h3>
-                            <p className="text-xs text-slate-500">Green accents, standard</p>
-                          </div>
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${formData.templateId === "modern" || !formData.templateId ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800 text-transparent'}`}>
-                            <Check className="w-4 h-4" />
-                          </div>
+                        <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                          <h3 className="font-bold text-sm text-slate-900 dark:text-white truncate">Modern</h3>
+                          <p className="text-xs text-slate-500 truncate">Green accents, standard</p>
                         </div>
                       </div>
 
                       {/* Executive Template */}
-                      <div 
+                      <div
                         onClick={() => setFormData(p => ({ ...p, templateId: "executive" }))}
-                        className={`cursor-pointer rounded-2xl border-2 transition-all overflow-hidden ${formData.templateId === "executive" ? 'border-primary shadow-md shadow-primary/20 scale-[1.02]' : 'border-slate-200 dark:border-slate-800 hover:border-primary/50'}`}
+                        className={`cursor-pointer rounded-2xl border-2 transition-all overflow-hidden ${formData.templateId === "executive" ? 'border-primary shadow-md shadow-primary/20' : 'border-slate-200 dark:border-slate-800 hover:border-primary/50'}`}
                       >
-                        <div className="h-32 bg-slate-100 flex items-center justify-center p-4">
+                        <div className="h-32 bg-slate-100 flex items-center justify-center p-4 relative">
                            <div className="w-full h-full bg-white shadow-sm flex flex-col p-2 gap-2 items-center">
                              <div className="w-3/4 h-2 bg-slate-900 rounded-sm mx-auto mb-1"></div>
                              <div className="w-full h-px bg-slate-900 mb-1"></div>
                              <div className="w-full h-1 bg-slate-300 rounded-sm self-start"></div>
                              <div className="w-5/6 h-1 bg-slate-300 rounded-sm self-start"></div>
                            </div>
+                           <div className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-opacity ${formData.templateId === "executive" ? 'bg-primary text-white opacity-100' : 'bg-white/90 opacity-0'}`}>
+                             <Check className="w-4 h-4" />
+                           </div>
                         </div>
-                        <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-bold text-slate-900 dark:text-white">Executive</h3>
-                              <span className="bg-amber-100 text-amber-700 border border-amber-200 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Premium</span>
-                            </div>
-                            <p className="text-xs text-slate-500">Traditional, serif, navy</p>
+                        <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                          <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                            <h3 className="font-bold text-sm text-slate-900 dark:text-white truncate">Executive</h3>
+                            <span className="bg-amber-100 text-amber-700 border border-amber-200 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-full shrink-0">Premium</span>
                           </div>
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${formData.templateId === "executive" ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800 text-transparent'}`}>
-                            <Check className="w-4 h-4" />
-                          </div>
+                          <p className="text-xs text-slate-500 truncate">Traditional, serif, navy</p>
                         </div>
                       </div>
 
                       {/* Minimalist Template */}
-                      <div 
+                      <div
                         onClick={() => setFormData(p => ({ ...p, templateId: "minimalist" }))}
-                        className={`cursor-pointer rounded-2xl border-2 transition-all overflow-hidden ${formData.templateId === "minimalist" ? 'border-primary shadow-md shadow-primary/20 scale-[1.02]' : 'border-slate-200 dark:border-slate-800 hover:border-primary/50'}`}
+                        className={`cursor-pointer rounded-2xl border-2 transition-all overflow-hidden ${formData.templateId === "minimalist" ? 'border-primary shadow-md shadow-primary/20' : 'border-slate-200 dark:border-slate-800 hover:border-primary/50'}`}
                       >
-                        <div className="h-32 bg-slate-100 flex items-center justify-center p-4">
+                        <div className="h-32 bg-slate-100 flex items-center justify-center p-4 relative">
                            <div className="w-full h-full bg-white shadow-sm flex p-2 gap-2">
                              <div className="w-1/3 h-full flex flex-col gap-2">
                                <div className="w-full h-1 bg-slate-300 rounded-sm"></div>
@@ -365,15 +357,13 @@ function CVBuilderContent() {
                                <div className="w-3/4 h-1 bg-slate-200 rounded-sm"></div>
                              </div>
                            </div>
+                           <div className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-opacity ${formData.templateId === "minimalist" ? 'bg-primary text-white opacity-100' : 'bg-white/90 opacity-0'}`}>
+                             <Check className="w-4 h-4" />
+                           </div>
                         </div>
-                        <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                          <div>
-                            <h3 className="font-bold text-slate-900 dark:text-white">Minimalist</h3>
-                            <p className="text-xs text-slate-500">Clean, 2-column, whitespace</p>
-                          </div>
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${formData.templateId === "minimalist" ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800 text-transparent'}`}>
-                            <Check className="w-4 h-4" />
-                          </div>
+                        <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                          <h3 className="font-bold text-sm text-slate-900 dark:text-white truncate">Minimalist</h3>
+                          <p className="text-xs text-slate-500 truncate">Clean, 2-column, whitespace</p>
                         </div>
                       </div>
 

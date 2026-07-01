@@ -16,6 +16,15 @@ export default function LoginPage() {
   const [authError, setAuthError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isInvited, setIsInvited] = useState(false);
+
+  useEffect(() => {
+    const refParam = new URLSearchParams(window.location.search).get("ref");
+    if (refParam) {
+      setIsInvited(true);
+      setIsSignUp(true);
+    }
+  }, []);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,6 +109,13 @@ export default function LoginPage() {
             <div className="flex lg:hidden justify-center mb-8">
               <Image src="/logo.png" alt="JengaCV" width={52} height={52} className="rounded-2xl" />
             </div>
+
+            {isInvited && (
+              <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-sm font-medium rounded-xl px-4 py-2.5 mb-6">
+                <Sparkles className="w-4 h-4 shrink-0" />
+                You were invited to JengaCV — sign up to get started.
+              </div>
+            )}
 
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-1.5">
               {isSignUp ? "Create your account" : "Welcome back"}

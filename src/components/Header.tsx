@@ -7,6 +7,7 @@ import { useDictionary } from "../context/DictionaryContext";
 import { LogOut, Globe, LayoutDashboard, ChevronRight } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -29,10 +30,10 @@ export default function Header() {
   };
 
   const navLinks = [
-    { href: `/${lang}/#features`, label: dict.header.features },
-    { href: `/${lang}/#how-it-works`, label: dict.header.howItWorks },
-    { href: `/${lang}/pricing`, label: dict.header.pricing },
-    { href: `/${lang}/interview`, label: "Interview Prep" },
+    { href: `/${lang}/#features`, label: dict.header.features, isRoute: false },
+    { href: `/${lang}/#how-it-works`, label: dict.header.howItWorks, isRoute: false },
+    { href: `/${lang}/pricing`, label: dict.header.pricing, isRoute: true },
+    { href: `/${lang}/interview`, label: "Interview Prep", isRoute: true },
   ];
 
   return (
@@ -44,6 +45,20 @@ export default function Header() {
             : "bg-transparent border-b border-transparent"
         }`}
       >
+        {/* Ambient glow — bleeds through the translucent scrolled header */}
+        <AnimatePresence>
+          {scrolled && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="absolute inset-0 pointer-events-none -z-10"
+              style={{ background: "radial-gradient(60% 120% at 50% 0%, rgba(59,130,246,0.10), transparent)" }}
+            />
+          )}
+        </AnimatePresence>
+
         <div className="container mx-auto px-4 sm:px-6 h-[68px] flex items-center justify-between gap-4">
           {/* Logo */}
           <Link
@@ -67,16 +82,32 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="relative px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100/80 dark:hover:bg-white/[0.06] group"
-              >
-                {link.label}
-                <span className="absolute bottom-1 left-4 right-4 h-px bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-200 rounded-full" />
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = link.isRoute && pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-lg group ${
+                    isActive
+                      ? "text-slate-900 dark:text-white"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/[0.06]"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active-pill"
+                      className="absolute inset-0 bg-primary/10 dark:bg-primary/15 rounded-lg"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                    />
+                  )}
+                  <span className="relative z-10">{link.label}</span>
+                  {!isActive && (
+                    <span className="absolute bottom-1 left-4 right-4 h-px bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-200 rounded-full" />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Actions */}

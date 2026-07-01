@@ -8,7 +8,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { useDictionary } from "../../../context/DictionaryContext";
 import { db } from "../../../lib/firebase/config";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { parsePdfDocument, processInterviewStep } from "../../actions";
+import { parsePdfDocument, processInterviewStep, generateInterviewSummary } from "../../actions";
 import Link from "next/link";
 
 interface ChatMessage {
@@ -34,6 +34,14 @@ export default function InterviewPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentQuestionCount, setCurrentQuestionCount] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [summary, setSummary] = useState<{
+    overallScore: number;
+    readinessVerdict: string;
+    strengths: string[];
+    improvements: string[];
+    negotiationTip: string;
+  } | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -59,6 +67,17 @@ export default function InterviewPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory, isProcessing]);
+
+  useEffect(() => {
+    if (!isComplete) return;
+    const sourceText = uploadedFileText || (selectedCv ? JSON.stringify(selectedCv.data) : "");
+    setSummaryLoading(true);
+    generateInterviewSummary(sourceText, chatHistory)
+      .then((res) => { if (res.success) setSummary(res.data as any); })
+      .catch((e) => console.error(e))
+      .finally(() => setSummaryLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isComplete]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -160,9 +179,9 @@ export default function InterviewPage() {
         {!isInterviewStarted ? (
           /* ══════ SETUP VIEW ══════ */
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/[0.07] rounded-3xl shadow-[var(--shadow-sm)] flex-1 p-8"
           >
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
@@ -373,16 +392,87 @@ export default function InterviewPage() {
             {/* Input */}
             <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-white/[0.06] bg-white dark:bg-slate-900 shrink-0">
               {isComplete ? (
-                <div className="text-center py-3">
-                  <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 mb-3">
-                    🎉 Interview complete! Great work.
-                  </p>
-                  <Link
-                    href={`/${lang}/dashboard`}
-                    className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 text-sm"
-                  >
-                    Back to Dashboard
-                  </Link>
+                <div className="py-2">
+                  {summaryLoading ? (
+                    <div className="flex items-center justify-center gap-2 py-8 text-slate-400 text-sm">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Compiling your interview readiness report…
+                    </div>
+                  ) : summary ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 16, filter: "blur(6px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                      className="bg-gradient-to-br from-primary/5 to-transparent border border-primary/20 rounded-2xl p-5 sm:p-6"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <Sparkles className="w-4 h-4 text-primary" />
+                          </div>
+                          <h3 className="font-bold text-slate-900 dark:text-white">Interview Readiness Report</h3>
+                        </div>
+                        <div className="text-2xl font-extrabold text-primary shrink-0">
+                          {summary.overallScore}<span className="text-sm text-slate-400 font-medium">/100</span>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-slate-600 dark:text-slate-300 mb-5">{summary.readinessVerdict}</p>
+
+                      <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 mb-2">Strengths</p>
+                          <ul className="space-y-1.5">
+                            {(summary.strengths || []).map((s, i) => (
+                              <li key={i} className="text-sm text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                                <span>{s}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400 mb-2">Areas to Improve</p>
+                          <ul className="space-y-1.5">
+                            {(summary.improvements || []).map((s, i) => (
+                              <li key={i} className="text-sm text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                                <span>{s}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {summary.negotiationTip && (
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/[0.07] rounded-xl p-4 mb-5">
+                          <p className="text-xs font-bold uppercase tracking-wide text-primary mb-1.5">💰 Salary Negotiation Tip</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">{summary.negotiationTip}</p>
+                        </div>
+                      )}
+
+                      <div className="text-center">
+                        <Link
+                          href={`/${lang}/dashboard`}
+                          className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 text-sm"
+                        >
+                          Back to Dashboard
+                        </Link>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="text-center py-3">
+                      <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 mb-3">
+                        🎉 Interview complete! Great work.
+                      </p>
+                      <Link
+                        href={`/${lang}/dashboard`}
+                        className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 text-sm"
+                      >
+                        Back to Dashboard
+                      </Link>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>

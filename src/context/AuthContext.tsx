@@ -7,7 +7,30 @@ import { auth, googleProvider, db } from "../lib/firebase/config";
 
 export interface UserData {
   premiumUntil?: number;
+  referredBy?: string;
+  referralCount?: number;
 }
+
+export const REFERRAL_GOAL = 3;
+const PREMIUM_BONUS_MS = 30 * 24 * 60 * 60 * 1000;
+
+const creditReferral = async (referrerUid: string) => {
+  try {
+    const refDocRef = doc(db, "users", referrerUid);
+    const refSnap = await getDoc(refDocRef);
+    if (!refSnap.exists()) return;
+    const referrerData = refSnap.data() as UserData;
+    const newCount = (referrerData.referralCount || 0) + 1;
+    const updates: Partial<UserData> = { referralCount: newCount };
+    if (newCount % REFERRAL_GOAL === 0) {
+      const base = referrerData.premiumUntil && referrerData.premiumUntil > Date.now() ? referrerData.premiumUntil : Date.now();
+      updates.premiumUntil = base + PREMIUM_BONUS_MS;
+    }
+    await setDoc(refDocRef, updates, { merge: true });
+  } catch (error) {
+    console.error("Failed to credit referral", error);
+  }
+};
 
 interface AuthContextType {
   user: User | null;
@@ -64,8 +87,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (docSnap.exists()) {
           setUserData(docSnap.data() as UserData);
         } else {
-          await setDoc(docRef, { createdAt: Date.now() }, { merge: true });
-          setUserData({});
+          const refParam = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("ref") : null;
+          const isValidReferral = refParam && refParam !== currentUser.uid;
+          await setDoc(docRef, { createdAt: Date.now(), ...(isValidReferral ? { referredBy: refParam } : {}) }, { merge: true });
+          setUserData(isValidReferral ? { referredBy: refParam! } : {});
+          if (isValidReferral) await creditReferral(refParam!);
         }
       } else {
         setUserData(null);

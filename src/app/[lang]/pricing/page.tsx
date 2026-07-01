@@ -55,9 +55,9 @@ export default function PricingPage() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
         <div className="container mx-auto px-4 sm:px-6 text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, y: 16, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="badge bg-white/10 text-white/80 border border-white/10 mx-auto mb-5">
               <Crown className="w-4 h-4" />
@@ -79,9 +79,9 @@ export default function PricingPage() {
 
           {/* Free card */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: 24, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200/60 dark:border-white/[0.07] shadow-[var(--shadow-md)] flex flex-col"
           >
             <div className="mb-8">
@@ -114,9 +114,9 @@ export default function PricingPage() {
 
           {/* Premium card */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: 24, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
             className="relative bg-white dark:bg-slate-900 rounded-3xl p-8 border-2 border-primary shadow-[var(--shadow-primary-lg)] flex flex-col overflow-hidden"
           >
             {/* Glow */}

@@ -235,6 +235,46 @@ export async function processInterviewStep(sourceText: string, chatHistory: any[
   }
 }
 
+export async function generateInterviewSummary(sourceText: string, chatHistory: any[]) {
+  try {
+    const prompt = `
+    You are an expert HR Manager and Interview Coach in Tanzania. The candidate just completed a mock interview.
+
+    Source Text (CV/profile):
+    "${sourceText}"
+
+    Full interview transcript (questions, answers, and per-answer scores/feedback where present):
+    ${JSON.stringify(chatHistory)}
+
+    Based on the full transcript, write a concise end-of-session performance report.
+
+    Return ONLY a JSON object with this exact format:
+    {
+      "overallScore": 78,
+      "readinessVerdict": "One sentence overall verdict on interview readiness",
+      "strengths": ["Strength 1", "Strength 2"],
+      "improvements": ["Area to improve 1", "Area to improve 2"],
+      "negotiationTip": "One concrete, Tanzania-market-aware salary/benefits negotiation tip tailored to this candidate's apparent seniority and role, to use once they receive an offer"
+    }
+    `;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        temperature: 0.5,
+        responseMimeType: "application/json",
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}");
+    return { success: true, data: result };
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    return { error: "Failed to generate interview summary." };
+  }
+}
+
 export async function createSnippeSession(userId: string) {
   try {
     const SNIPPE_API_KEY = process.env.SNIPPE_API_KEY;
